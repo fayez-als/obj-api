@@ -1,0 +1,6 @@
+tensorflow
+tensorflow_hub
+Pillow
+flask
+flask_restful
+flask_cors
