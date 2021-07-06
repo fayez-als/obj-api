@@ -19,6 +19,19 @@ from PIL import ImageColor
 from PIL import ImageDraw
 from PIL import ImageFont
 from PIL import ImageOps
+import random
+import string
+
+
+
+def get_random_string(length):
+    # choose from all lowercase letter
+    letters = string.ascii_lowercase
+    result_str = ''.join(random.choice(letters) for i in range(length))
+    return result_str
+
+
+
 
 
 def load_img(path):
@@ -27,7 +40,7 @@ def load_img(path):
     
     
     img = tf.image.decode_jpeg(img, channels=3)
-    
+
     return img
 def run_detector(detector, path):
     
@@ -144,20 +157,28 @@ def home():
 @app.route('/upload',methods=['POST'])
 @cross_origin(origin="*",headers=['Content-Type','Authorization'])
 def upload_files():
+    name = get_random_string(20)+'.jpg'
+
     uploaded_file = request.files['image']
     if uploaded_file.filename !="":
-        uploaded_file.save('guitar.jpg')
+        uploaded_file.save(name)
+        image = Image.open(name)
+        image.thumbnail((600,600))
+        image.save(name)
     
-        img = load_img('guitar.jpg')
-        os.remove("guitar.jpg")
+        img = load_img(name)
+        os.remove(name)
         converted_img  = tf.image.convert_image_dtype(img, tf.float32)[tf.newaxis, ...]
+        converted_img = tf.image.resize(converted_img, [600,600], preserve_aspect_ratio=True)
+
         result = detector(converted_img)
+        
         image_with_boxes = draw_boxes(img.numpy(), result["detection_boxes"].numpy(),result["detection_class_entities"].numpy(), result["detection_scores"].numpy())
         im = Image.fromarray(image_with_boxes)
-        im.save('detected.jpg')
-        with open("detected.jpg", "rb") as image_file:
+        im.save('predicted_'+name)
+        with open('predicted_'+name, "rb") as image_file:
             encoded_string = base64.b64encode(image_file.read())
-        os.remove("detected.jpg")
+        os.remove('predicted_'+name)
 
         return encoded_string
     
@@ -167,6 +188,6 @@ def upload_files():
 
 
 if __name__=='__main__':
-    app.run(host='0.0.0.0')
+    app.run(threaded=True, host='0.0.0.0')
 
 
