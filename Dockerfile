@@ -1,4 +1,4 @@
-FROM python:3.8
+FROM tensorflow/tensorflow
 EXPOSE 5000
 
 COPY . . 
