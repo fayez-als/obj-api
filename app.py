@@ -132,7 +132,7 @@ def draw_boxes(image, boxes, class_names, scores, max_boxes=10, min_score=0.1):
     return image
 
 
-module_handle = "https://tfhub.dev/google/openimages_v4/ssd/mobilenet_v2/1"
+module_handle = "resnet/"
 model = hub.load(module_handle)
 detector = model.signatures['default']
 
