@@ -188,6 +188,6 @@ def upload_files():
 
 
 if __name__=='__main__':
-    app.run(host='0.0.0.0',threaded=True,port=port)
+    app.run()
 
 
